@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "macro-calendar": {
+      "source": "termix-official/cryptoclaw",
+      "sourceType": "github",
+      "skillPath": "skills/macro-calendar/SKILL.md",
+      "computedHash": "0aa0b340895ff74dba6f7065831d3f6adf699c7ade148dfb3432e2e143eee0fe"
+    }
+  }
+}

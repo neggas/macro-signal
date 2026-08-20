@@ -19,6 +19,24 @@ export interface IndicatorInput {
   sign: number;
   weight: number;
   releaseDate?: string;
+  /** True when actual is a published reading (FRED, calendar actual, manual) */
+  released?: boolean;
+  source?: string;
+}
+
+export interface EconomicEvent {
+  id: number;
+  source: string;
+  currencyCode: string;
+  eventName: string;
+  indicatorName: string | null;
+  impact: string;
+  eventTime: string;
+  releaseDate: string;
+  previous: number;
+  forecast: number;
+  actual: number | null;
+  unit: string | null;
 }
 
 export interface IndicatorResult {
@@ -124,6 +142,9 @@ export interface SignalSnapshot {
   macroDiff: number;
   entryPrice: number;
   exitPrice: number;
+  stopLoss: number;
+  takeProfit: number;
+  riskPercent: number;
   returnPct: number;
   result: string;
 }

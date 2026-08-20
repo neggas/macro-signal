@@ -1,6 +1,7 @@
 /**
- * Maps API event names (from JBlanked/MQL5/ForexFactory) to internal indicator names.
+ * Maps API event names (from FMP/ForexFactory/MQL5) to internal indicator names.
  * Rules are ordered by priority — first match wins.
+ * Supports both Forex Factory and FMP (Financial Modeling Prep) naming conventions.
  */
 
 const RULES: Array<{

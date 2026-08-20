@@ -16,18 +16,18 @@ function clamp(val: number, min: number, max: number): number {
 
 function approxSigma(forecast: number, previous: number): number {
   const diff = Math.abs(forecast - previous) / 2;
-  if (diff > 0) return diff;
-  // Fallback: use a fraction of the forecast magnitude
-  return Math.abs(forecast) * 0.1 || 1;
+  const magnitude = Math.max(Math.abs(forecast), Math.abs(previous), 1);
+  const fallback = magnitude * 0.05;
+  return Math.max(diff, fallback);
 }
 
 export function computeCategoryScore(indicators: IndicatorInput[]): CategoryScore {
   const results = indicators.map((ind) => {
     const sigma = ind.sigma && ind.sigma > 0 ? ind.sigma : approxSigma(ind.forecast, ind.previous);
 
-    // If actual is 0 and forecast is non-zero, the event is likely not yet released.
-    // Use (forecast - previous) as a proxy for expected direction (anticipation score).
-    const isUnreleased = ind.actual === 0 && ind.forecast !== 0;
+    // Unreleased: calendar forecast exists but no published actual yet.
+    const isUnreleased =
+      ind.released === false || (ind.released === undefined && ind.actual === 0 && ind.forecast !== 0);
     const effectiveActual = isUnreleased ? ind.forecast : ind.actual;
     const rawScore = (effectiveActual - ind.forecast) / sigma;
     const clampedScore = clamp(rawScore, -2, 2);
