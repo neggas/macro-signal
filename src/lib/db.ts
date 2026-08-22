@@ -41,16 +41,17 @@ function createDb(databasePath: string): Db {
   };
 }
 
-const dataDir = path.join(process.cwd(), "data");
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
+function initDb(): Db {
+  const dataDir = path.join(process.cwd(), "data");
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
 
-const DB_PATH = path.join(dataDir, "macro.db");
-const db = createDb(DB_PATH);
-db.pragma("journal_mode = WAL");
+  const DB_PATH = path.join(dataDir, "macro.db");
+  const db = createDb(DB_PATH);
+  db.pragma("journal_mode = WAL");
 
-db.exec(`
+  db.exec(`
 CREATE TABLE IF NOT EXISTS currencies (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   code TEXT UNIQUE NOT NULL,
@@ -227,5 +228,23 @@ if (mpCount.c === 0) {
     "INSERT INTO market_positioning (cot_spx_net_spec, cot_usd_net_spec, vix_level, retail_sentiment) VALUES (0, 0, 20, 'neutral')"
   ).run();
 }
+
+  return db;
+}
+
+let _db: Db | null = null;
+
+function getDb(): Db {
+  if (!_db) {
+    _db = initDb();
+  }
+  return _db;
+}
+
+const db = new Proxy({} as Db, {
+  get(_target, prop: keyof Db) {
+    return getDb()[prop];
+  },
+});
 
 export default db;
