@@ -229,6 +229,32 @@ if (mpCount.c === 0) {
   ).run();
 }
 
+// Seed major currencies if empty
+const curCount = db.prepare("SELECT COUNT(*) as c FROM currencies").get() as { c: number };
+if (curCount.c === 0) {
+  const currencies = [
+    { code: "USD", name: "US Dollar" },
+    { code: "EUR", name: "Euro" },
+    { code: "GBP", name: "British Pound" },
+    { code: "JPY", name: "Japanese Yen" },
+    { code: "CHF", name: "Swiss Franc" },
+    { code: "CAD", name: "Canadian Dollar" },
+    { code: "AUD", name: "Australian Dollar" },
+    { code: "NZD", name: "New Zealand Dollar" },
+  ];
+  const insertCur = db.prepare("INSERT OR IGNORE INTO currencies (code, name) VALUES (?, ?)");
+  const insertInd = db.prepare(
+    "INSERT INTO indicator_data (currency_id, indicator_name, category, sign, weight) VALUES (?, ?, ?, ?, ?)"
+  );
+  for (const cur of currencies) {
+    insertCur.run(cur.code, cur.name);
+    const curId = (db.prepare("SELECT id FROM currencies WHERE code = ?").get(cur.code) as { id: number }).id;
+    for (const t of templates) {
+      insertInd.run(curId, t.name, t.category, t.sign, t.weight);
+    }
+  }
+}
+
   return db;
 }
 

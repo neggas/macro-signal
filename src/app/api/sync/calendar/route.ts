@@ -5,7 +5,7 @@ import { fetchFMPCalendar, syncFMPEventsToDb } from "@/lib/fmp-calendar";
 export async function POST(req: Request) {
   const { searchParams } = new URL(req.url);
   const includeAll = searchParams.get("all") === "true";
-  const from = searchParams.get("from") ?? new Date().toISOString().split("T")[0];
+  const from = searchParams.get("from") ?? new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
   const to = searchParams.get("to") ?? new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
   const country = searchParams.get("country") ?? undefined;
 

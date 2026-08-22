@@ -124,6 +124,28 @@ export function CalendarPanel() {
     }
   };
 
+  const syncAll = async () => {
+    setSyncing(true);
+    setSyncMessage(null);
+    try {
+      const calRes = await fetch("/api/sync/calendar", { method: "POST" });
+      const calData = await calRes.json();
+      const indRes = await fetch("/api/sync/indicators", { method: "POST" });
+      const indData = await indRes.json();
+
+      const parts: string[] = [];
+      if (!calData.error) parts.push(`${calData.eventsSaved} événements`);
+      if (!indData.error) parts.push(`${indData.totalSaved} points indicateurs US`);
+
+      setSyncMessage(parts.length > 0 ? `Sync terminé: ${parts.join(", ")}` : "Erreur lors de la sync");
+      loadEvents();
+    } catch (err) {
+      setSyncMessage((err as Error).message);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const upcoming = useMemo(() => events.filter((e) => isUpcoming(e.eventTime)), [events]);
   const past = useMemo(() => events.filter((e) => !isUpcoming(e.eventTime)), [events]);
 
@@ -224,7 +246,10 @@ export function CalendarPanel() {
               {loading ? "..." : "Rafraîchir"}
             </Button>
             <Button size="sm" disabled={syncing} onClick={syncCalendar}>
-              {syncing ? "Sync..." : "Sync calendrier FMP"}
+              {syncing ? "Sync..." : "Sync calendrier"}
+            </Button>
+            <Button size="sm" variant="secondary" disabled={syncing} onClick={syncAll}>
+              {syncing ? "Sync..." : "Sync tout (cal + indicateurs)"}
             </Button>
           </div>
         </div>
