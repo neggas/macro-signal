@@ -1,0 +1,7 @@
+{
+  "provider": "node",
+  "nodeVersion": "22",
+  "buildCommand": "npm run build",
+  "startCommand": "node server.js",
+  "outputDir": ".next/standalone"
+}
